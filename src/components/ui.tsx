@@ -65,6 +65,9 @@ export function Enter({ children, delay = 0, style }: { children: React.ReactNod
       easing: Easing.out(Easing.cubic),
       useNativeDriver: nativeDriver,
     }).start();
+    // Fail-safe: content must never stay invisible if an animation frame is skipped.
+    const t = setTimeout(() => v.setValue(1), (reduced ? 0 : delay) + 600);
+    return () => clearTimeout(t);
   }, [v, reduced, delay]);
   const translateY = reduced ? 0 : v.interpolate({ inputRange: [0, 1], outputRange: [motion.enterRise, 0] });
   return <Animated.View style={[style, { opacity: v, transform: [{ translateY }] }]}>{children}</Animated.View>;
